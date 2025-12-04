@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лаб. работы 6a, 6b, 6c - 3D Буква "Ю"</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cube"></i> Лабораторные работы 6a, 6b, 6c</h1>
+            <h2>Трехмерная графика: преобразования и проекции</h2>
+            <p class="subtitle">3D модель буквы "Ю" с преобразованиями и проекциями</p>
+        </header>
+
+        <div class="main-content">
+            <!-- 3D ВИЗУАЛИЗАЦИЯ -->
+            <div class="scene-container">
+                <div class="scene-tabs">
+                    <button class="tab-btn active" data-scene="main">3D Объект</button>
+                    <button class="tab-btn" data-scene="xy">Проекция XY</button>
+                    <button class="tab-btn" data-scene="xz">Проекция XZ</button>
+                    <button class="tab-btn" data-scene="yz">Проекция YZ</button>
+                </div>
+                <div id="scene3d"></div>
+                <div class="matrix-display">
+                    <h3><i class="fas fa-calculator"></i> Матрица преобразования:</h3>
+                    <div id="matrixOutput">Единичная матрица</div>
+                </div>
+            </div>
+
+            <!-- ПАНЕЛЬ УПРАВЛЕНИЯ -->
+            <div class="controls-panel">
+                <!-- Лаб 6a: Базовые настройки -->
+                <div class="control-group">
+                    <h3><i class="fas fa-sliders-h"></i> Лаб 6a: Базовые настройки</h3>
+                    
+                    <div class="control">
+                        <label for="scale">Масштаб: <span id="scaleValue">1.0</span>x</label>
+                        <input type="range" id="scale" min="0.5" max="3" step="0.1" value="1.0" class="slider">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="color">Цвет объекта:</label>
+                        <input type="color" id="color" value="#3498db">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="wireframeColor">Цвет каркаса:</label>
+                        <input type="color" id="wireframeColor" value="#e74c3c">
+                    </div>
+                    
+                    <div class="control">
+                        <label>
+                            <input type="checkbox" id="showWireframe" checked>
+                            Показывать каркас
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Лаб 6b: 3D Преобразования -->
+                <div class="control-group">
+                    <h3><i class="fas fa-sync-alt"></i> Лаб 6b: 3D Преобразования</h3>
+                    
+                    <div class="control">
+                        <label for="translateX">Перенос X: <span id="translateXValue">0.0</span></label>
+                        <input type="range" id="translateX" min="-5" max="5" step="0.1" value="0" class="slider">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="translateY">Перенос Y: <span id="translateYValue">0.0</span></label>
+                        <input type="range" id="translateY" min="-5" max="5" step="0.1" value="0" class="slider">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="translateZ">Перенос Z: <span id="translateZValue">0.0</span></label>
+                        <input type="range" id="translateZ" min="-5" max="5" step="0.1" value="0" class="slider">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="rotateAngle">Вращение (угол): <span id="rotateAngleValue">0</span>°</label>
+                        <input type="range" id="rotateAngle" min="0" max="360" value="0" class="slider">
+                    </div>
+                    
+                    <div class="control">
+                        <label for="rotateAxis">Ось вращения:</label>
+                        <select id="rotateAxis" class="dropdown">
+                            <option value="x">Ось X</option>
+                            <option value="y">Ось Y</option>
+                            <option value="z">Ось Z</option>
+                            <option value="custom">Произвольная ось</option>
+                        </select>
+                    </div>
+                    
+                    <div id="customAxisControls" style="display: none;">
+                        <div class="control">
+                            <label for="axisX">Ось X: <span id="axisXValue">1.0</span></label>
+                            <input type="range" id="axisX" min="-1" max="1" step="0.1" value="1" class="slider">
+                        </div>
+                        <div class="control">
+                            <label for="axisY">Ось Y: <span id="axisYValue">0.0</span></label>
+                            <input type="range" id="axisY" min="-1" max="1" step="0.1" value="0" class="slider">
+                        </div>
+                        <div class="control">
+                            <label for="axisZ">Ось Z: <span id="axisZValue">0.0</span></label>
+                            <input type="range" id="axisZ" min="-1" max="1" step="0.1" value="0" class="slider">
+                        </div>
+                    </div>
+                    
+                    <div class="control-buttons">
+                        <button id="resetTransform" class="btn-small"><i class="fas fa-undo"></i> Сбросить преобразования</button>
+                    </div>
+                </div>
+                
+                <!-- Лаб 6c: Проекции -->
+                <div class="control-group">
+                    <h3><i class="fas fa-project-diagram"></i> Лаб 6c: Ортографические проекции</h3>
+                    
+                    <div class="control">
+                        <label>
+                            <input type="checkbox" id="showProjections" checked>
+                            Показывать проекции
+                        </label>
+                    </div>
+                    
+                    <div class="control">
+                        <label>
+                            <input type="checkbox" id="showProjectionLines" checked>
+                            Линии связи проекций
+                        </label>
+                    </div>
+                    
+                    <div class="projections-info">
+                        <p><strong>Проекции:</strong></p>
+                        <ul>
+                            <li><span class="proj-color" style="background-color: #00ff00;"></span> XY (вид сверху)</li>
+                            <li><span class="proj-color" style="background-color: #ff00ff;"></span> XZ (вид спереди)</li>
+                            <li><span class="proj-color" style="background-color: #ffff00;"></span> YZ (вид сбоку)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Информация -->
+                <div class="info-box">
+                    <h3><i class="fas fa-info-circle"></i> Информация об объекте</h3>
+                    <p>Буква "Ю" - 11-я буква русского алфавита.</p>
+                    <p>Количество вершин: <span id="vertexCount">0</span></p>
+                    <p>Количество граней: <span id="faceCount">0</span></p>
+                    <p>Текущая матрица преобразования 4x4:</p>
+                    <div id="matrixDisplay" class="matrix"></div>
+                </div>
+                
+                <div class="instructions">
+                    <h3><i class="fas fa-mouse-pointer"></i> Управление</h3>
+                    <p>• Вращение 3D сцены: ЛКМ + движение</p>
+                    <p>• Приближение/отдаление: колесо мыши</p>
+                    <p>• Переключение проекций: вкладки над сценой</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Лабораторные работы по компьютерной графике: 6a (3D визуализация), 6b (3D преобразования), 6c (ортографические проекции)</p>
+            <p>Three.js версия: <span id="threeVersion">загрузка...</span></p>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
